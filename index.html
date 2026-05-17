@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>澎湃First</title>
+        <meta name="description" content="澎湃First 下载页面" />
+        <style>
+            :root {
+                --bg: #0f172a;
+                --card: rgba(255, 255, 255, 0.08);
+                --border: rgba(255, 255, 255, 0.16);
+                --text: #e5e7eb;
+                --muted: #94a3b8;
+                --primary: #38bdf8;
+                --primary-hover: #0ea5e9;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 24px;
+                font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+                background: radial-gradient(
+                    circle at top,
+                    #1e293b 0%,
+                    var(--bg) 55%
+                );
+                color: var(--text);
+            }
+
+            .card {
+                width: 100%;
+                max-width: 720px;
+                background: var(--card);
+                border: 1px solid var(--border);
+                border-radius: 24px;
+                padding: 48px 32px;
+                text-align: center;
+                backdrop-filter: blur(12px);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+            }
+
+            h1 {
+                margin: 0 0 16px;
+                font-size: clamp(2rem, 5vw, 3.5rem);
+                line-height: 1.1;
+            }
+
+            p {
+                margin: 0;
+                color: var(--muted);
+                font-size: 1.05rem;
+                line-height: 1.8;
+            }
+
+            .actions {
+                margin-top: 32px;
+            }
+
+            .download-btn {
+                display: inline-block;
+                padding: 14px 28px;
+                border-radius: 999px;
+                background: var(--primary);
+                color: #062033;
+                font-size: 1rem;
+                font-weight: 700;
+                text-decoration: none;
+                transition:
+                    transform 0.2s ease,
+                    background 0.2s ease,
+                    box-shadow 0.2s ease;
+                box-shadow: 0 10px 30px rgba(56, 189, 248, 0.3);
+            }
+
+            .download-btn:hover {
+                background: var(--primary-hover);
+                transform: translateY(-2px);
+            }
+
+            .link-text {
+                margin-top: 20px;
+                word-break: break-all;
+                font-size: 0.95rem;
+            }
+
+            .link-text a {
+                color: #7dd3fc;
+                text-decoration: none;
+            }
+
+            .link-text a:hover {
+                text-decoration: underline;
+            }
+
+            footer {
+                margin-top: 28px;
+                color: #64748b;
+                font-size: 0.9rem;
+            }
+        </style>
+    </head>
+    <body>
+        <main class="card">
+            <h1>澎湃First</h1>
+            <p>欢迎下载澎湃First，点击下方按钮即可前往下载页面。</p>
+
+            <div class="actions">
+                <a
+                    class="download-btn"
+                    href="https://1816736646.share.123pan.cn/123pan/Vot6Vv-HoIi3"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >立即下载</a
+                >
+            </div>
+        </main>
+    </body>
+</html>
