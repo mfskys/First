@@ -1,127 +1,934 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>澎湃First</title>
-        <meta name="description" content="澎湃First 下载页面" />
-        <style>
-            :root {
-                --bg: #0f172a;
-                --card: rgba(255, 255, 255, 0.08);
-                --border: rgba(255, 255, 255, 0.16);
-                --text: #e5e7eb;
-                --muted: #94a3b8;
-                --primary: #38bdf8;
-                --primary-hover: #0ea5e9;
-            }
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>澎湃First — 小米澎湃生态全能助手</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,600&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root {
+    --bg: #FBF8F2;
+    --bg-warm: #F7F0E5;
+    --bg-deep: #EDE8DD;
+    --surface: #FFFFFF;
+    --surface-tint: #FFFAF3;
+    /* 橘色主色 */
+    --accent: #E27A2B;
+    --accent-soft: rgba(226,122,43,0.09);
+    --accent-hover: #F08E3A;
+    /* 绿色辅色 */
+    --green: #2D8B5E;
+    --green-soft: rgba(45,139,94,0.09);
+    --green-light: #3AAE74;
+    /* 文字与分割 */
+    --ink: #1A1816;
+    --ink-secondary: #5C554D;
+    --ink-muted: #9E958B;
+    --ink-faint: #C8C0B6;
+    --rule: #DDD5CB;
+    --rule-light: #EBE5DD;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Source Serif 4', Georgia, serif;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 9999;
+    pointer-events: none; opacity: 0.028;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  }
+  ::selection { background: var(--accent); color: #fff; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 clamp(24px, 5vw, 64px); }
+  .narrow { max-width: 680px; }
 
-            * {
-                box-sizing: border-box;
-            }
+  /* LOADER */
+  .loader {
+    position: fixed; inset: 0; z-index: 10000;
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transition: opacity 0.6s var(--ease), visibility 0.6s;
+  }
+  .loader.done { opacity: 0; visibility: hidden; pointer-events: none; }
+  .loader-mark {
+    font-family: var(--font-display);
+    font-weight: 900; font-size: 2.8rem;
+    color: var(--ink);
+    opacity: 0; animation: lIn 0.6s var(--ease) 0.2s forwards;
+  }
+  .loader-mark em { font-style: italic; color: var(--accent); }
+  .loader-line {
+    width: 64px; height: 2px; background: var(--rule);
+    margin-top: 24px; border-radius: 2px; overflow: hidden;
+    opacity: 0; animation: lIn 0.4s var(--ease) 0.5s forwards;
+  }
+  .loader-line span {
+    display: block; width: 0; height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--green));
+    animation: lGrow 1.2s var(--ease) 0.6s forwards;
+  }
+  @keyframes lIn { to { opacity: 1; } }
+  @keyframes lGrow { to { width: 100%; } }
 
-            body {
-                margin: 0;
-                min-height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 24px;
-                font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
-                background: radial-gradient(
-                    circle at top,
-                    #1e293b 0%,
-                    var(--bg) 55%
-                );
-                color: var(--text);
-            }
+  /* NAV */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    padding: 0 clamp(24px,5vw,64px);
+    height: 72px; display: flex; align-items: center; justify-content: space-between;
+    background: rgba(251,248,242,0.85);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .nav.stuck { border-bottom-color: var(--rule-light); background: rgba(251,248,242,0.95); }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-weight: 800; font-size: 1.3rem;
+    color: var(--ink); text-decoration: none;
+  }
+  .nav-logo em { font-style: italic; color: var(--accent); }
+  .nav-links { display: flex; gap: 36px; align-items: center; }
+  .nav-links a {
+    font-size: 0.85rem; color: var(--ink-secondary);
+    text-decoration: none; letter-spacing: 0.01em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta {
+    font-family: var(--font-body); font-size: 0.85rem;
+    padding: 10px 24px; border-radius: 100px;
+    background: var(--ink); color: var(--bg);
+    text-decoration: none; border: none; cursor: pointer;
+    transition: background 0.25s, transform 0.25s;
+  }
+  .nav-cta:hover { background: var(--accent); transform: translateY(-1px); color: #fff; }
+  .hamburger { display: none; background: none; border: none; cursor: pointer; color: var(--ink); }
+  .hamburger svg { width: 26px; height: 26px; }
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .nav-links.open {
+      display: flex; flex-direction: column;
+      position: absolute; top: 72px; left: 0; right: 0;
+      background: rgba(251,248,242,0.97); backdrop-filter: blur(16px);
+      padding: 28px 32px; gap: 22px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .nav-links.open a { font-size: 1.05rem; }
+    .hamburger { display: flex; }
+    .nav-cta { display: none; }
+  }
 
-            .card {
-                width: 100%;
-                max-width: 720px;
-                background: var(--card);
-                border: 1px solid var(--border);
-                border-radius: 24px;
-                padding: 48px 32px;
-                text-align: center;
-                backdrop-filter: blur(12px);
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-            }
+  /* HERO */
+  .hero {
+    padding: 160px 0 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(40px, 6vw, 100px);
+    align-items: center;
+    min-height: 100vh;
+  }
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; text-align: center; padding-top: 130px; }
+    .hero-rhs { order: -1; }
+  }
+  .hero-eyebrow {
+    font-size: 0.75rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 20px;
+    opacity: 0; animation: up 0.7s var(--ease) 1.6s forwards;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(3.2rem, 7vw, 5.5rem);
+    font-weight: 900; line-height: 1; letter-spacing: -0.03em;
+    margin-bottom: 20px;
+    opacity: 0; animation: up 0.8s var(--ease) 1.75s forwards;
+  }
+  .hero h1 em {
+    font-style: italic; color: var(--accent);
+    position: relative;
+  }
+  .hero h1 em::after {
+    content: '';
+    position: absolute; bottom: 4px; left: 0; right: 0;
+    height: 3px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--green));
+    opacity: 0.35;
+  }
+  .hero-lead {
+    font-size: 1.12rem; color: var(--ink-secondary);
+    line-height: 1.85; max-width: 480px; margin-bottom: 36px;
+    opacity: 0; animation: up 0.8s var(--ease) 1.9s forwards;
+  }
+  @media (max-width: 860px) {
+    .hero-lead { margin-left: auto; margin-right: auto; }
+  }
+  .hero-actions {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    opacity: 0; animation: up 0.8s var(--ease) 2.05s forwards;
+  }
+  @media (max-width: 860px) { .hero-actions { justify-content: center; } }
 
-            h1 {
-                margin: 0 0 16px;
-                font-size: clamp(2rem, 5vw, 3.5rem);
-                line-height: 1.1;
-            }
+  .btn {
+    font-family: var(--font-body); font-size: 0.92rem;
+    padding: 15px 34px; border-radius: 100px;
+    text-decoration: none; font-weight: 500; border: none;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.3s var(--ease);
+  }
+  .btn-dark { background: var(--ink); color: var(--bg); }
+  .btn-dark:hover {
+    background: var(--accent); color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(226,122,43,0.2);
+  }
+  .btn-outline {
+    background: transparent; color: var(--ink);
+    border: 1.5px solid var(--rule);
+  }
+  .btn-outline:hover { border-color: var(--green); color: var(--green); background: var(--green-soft); }
 
-            p {
-                margin: 0;
-                color: var(--muted);
-                font-size: 1.05rem;
-                line-height: 1.8;
-            }
+  .hero-rhs {
+    display: flex; justify-content: center; align-items: center;
+    opacity: 0; animation: up 1s var(--ease) 2s forwards;
+  }
+  .hero-card-stack {
+    position: relative; width: 320px; height: 420px;
+    perspective: 1200px;
+  }
+  .hcard {
+    position: absolute; border-radius: 20px;
+    background: var(--surface);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04);
+    transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+  }
+  .hcard:hover { transform: translateY(-6px) !important; box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+  .hcard-1 {
+    width: 260px; height: 180px;
+    top: 0; left: 30px; z-index: 3;
+    transform: rotate(-2deg);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--green) 100%);
+    color: #fff; padding: 28px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .hcard-1 h3 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; }
+  .hcard-1 p { font-size: 0.78rem; opacity: 0.8; }
+  .hcard-1-dots { display: flex; gap: 6px; }
+  .hcard-1-dots span { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.4); }
+  .hcard-1-dots span:first-child { background: #fff; }
+  .hcard-2 {
+    width: 240px; height: 200px;
+    top: 130px; left: 0; z-index: 4;
+    transform: rotate(2deg);
+    padding: 24px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .hcard-2 h4 { font-family: var(--font-display); font-size: 1rem; font-weight: 700; }
+  .hcard-bar { height: 6px; border-radius: 3px; background: var(--rule-light); overflow: hidden; }
+  .hcard-bar span { display: block; height: 100%; border-radius: 3px; }
+  .hcard-bar span.b1 { width: 86%; background: var(--accent); }
+  .hcard-bar span.b2 { width: 64%; background: var(--green); opacity: 0.35; }
+  .hcard-bar span.b3 { width: 92%; background: var(--green); }
+  .hcard-3 {
+    width: 200px; height: 150px;
+    top: 110px; right: 0; z-index: 2;
+    transform: rotate(4deg);
+    background: var(--bg-deep);
+    padding: 20px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center;
+  }
+  .hcard-3 .big {
+    font-family: var(--font-display); font-weight: 900;
+    font-size: 2.5rem; color: var(--green); line-height: 1;
+  }
+  .hcard-3 .sub { font-size: 0.72rem; color: var(--ink-muted); margin-top: 4px; letter-spacing: 0.06em; }
+  .hcard-float {
+    position: absolute; bottom: 10px; right: 20px;
+    background: var(--surface); border-radius: 12px;
+    padding: 12px 18px; z-index: 5;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    font-size: 0.75rem; font-weight: 500;
+    display: flex; align-items: center; gap: 8px;
+    animation: floatCard 3s ease-in-out infinite alternate;
+  }
+  .hcard-float .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+  @keyframes floatCard { 0% { transform: translateY(0); } 100% { transform: translateY(-8px); } }
+  @keyframes up {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-            .actions {
-                margin-top: 32px;
-            }
+  /* QUOTE */
+  .quote-section { padding: 100px 0; text-align: center; }
+  .quote-section blockquote {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+    font-weight: 600; font-style: italic;
+    line-height: 1.45; color: var(--ink);
+    max-width: 800px; margin: 0 auto;
+  }
+  .quote-section blockquote span { color: var(--accent); }
+  .quote-section blockquote span.g { color: var(--green); }
+  .quote-section cite {
+    display: block; margin-top: 20px;
+    font-style: normal; font-size: 0.82rem; color: var(--ink-muted);
+    letter-spacing: 0.06em;
+  }
 
-            .download-btn {
-                display: inline-block;
-                padding: 14px 28px;
-                border-radius: 999px;
-                background: var(--primary);
-                color: #062033;
-                font-size: 1rem;
-                font-weight: 700;
-                text-decoration: none;
-                transition:
-                    transform 0.2s ease,
-                    background 0.2s ease,
-                    box-shadow 0.2s ease;
-                box-shadow: 0 10px 30px rgba(56, 189, 248, 0.3);
-            }
+  /* STATS */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  }
+  .stats > div {
+    padding: 48px 28px; text-align: center;
+    border-right: 1px solid var(--rule-light);
+  }
+  .stats > div:last-child { border-right: none; }
+  .stats-num {
+    font-family: var(--font-display);
+    font-weight: 800; font-size: 2.8rem;
+    line-height: 1;
+  }
+  .stats-num.o { color: var(--accent); }
+  .stats-num.g { color: var(--green); }
+  .stats-label {
+    font-size: 0.78rem; color: var(--ink-muted);
+    margin-top: 8px; letter-spacing: 0.03em;
+  }
+  @media (max-width: 640px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stats > div:nth-child(2) { border-right: none; }
+    .stats > div:nth-child(3), .stats > div:nth-child(4) { border-top: 1px solid var(--rule-light); }
+  }
 
-            .download-btn:hover {
-                background: var(--primary-hover);
-                transform: translateY(-2px);
-            }
+  /* SECTIONS */
+  .section { padding: 100px 0; }
+  .section-eyebrow {
+    font-size: 0.7rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-eyebrow::before { content: ''; width: 32px; height: 1.5px; background: var(--accent); }
+  .section-heading {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    font-weight: 800; line-height: 1.1;
+    letter-spacing: -0.025em; margin-bottom: 16px;
+  }
+  .section-heading em { font-style: italic; color: var(--accent); }
+  .section-heading em.g { color: var(--green); }
+  .section-sub {
+    font-size: 1.02rem; color: var(--ink-secondary);
+    max-width: 520px; line-height: 1.8; margin-bottom: 56px;
+  }
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.65s var(--ease), transform 0.65s var(--ease); }
+  .reveal.vis { opacity: 1; transform: none; }
 
-            .link-text {
-                margin-top: 20px;
-                word-break: break-all;
-                font-size: 0.95rem;
-            }
+  /* FEATURES */
+  .features-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 860px) { .features-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 540px) { .features-grid { grid-template-columns: 1fr; } }
+  .fcard {
+    background: var(--surface);
+    border: 1px solid var(--rule-light);
+    border-radius: 16px; padding: 36px 30px;
+    transition: all 0.4s var(--ease);
+    position: relative; overflow: hidden;
+  }
+  .fcard:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(226,122,43,0.07);
+  }
+  .fcard.alt:hover { border-color: var(--green); box-shadow: 0 16px 48px rgba(45,139,94,0.07); }
+  .fcard.wide { grid-column: span 2; }
+  @media (max-width: 540px) { .fcard.wide { grid-column: span 1; } }
+  .fcard-num {
+    font-family: var(--font-display); font-weight: 800;
+    font-size: 3rem; color: var(--rule-light); line-height: 1;
+    margin-bottom: 16px; transition: color 0.3s;
+  }
+  .fcard:hover .fcard-num { color: rgba(226,122,43,0.12); }
+  .fcard.alt:hover .fcard-num { color: rgba(45,139,94,0.12); }
+  .fcard h3 { font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; margin-bottom: 10px; }
+  .fcard p { font-size: 0.88rem; color: var(--ink-secondary); line-height: 1.7; }
+  .fcard-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+  .ftag {
+    font-size: 0.68rem; padding: 4px 10px; border-radius: 100px;
+    background: var(--accent-soft); color: var(--accent);
+    letter-spacing: 0.02em;
+  }
+  .ftag.g { background: var(--green-soft); color: var(--green); }
 
-            .link-text a {
-                color: #7dd3fc;
-                text-decoration: none;
-            }
+  /* TECH */
+  .tech-section {
+    padding: 80px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    text-align: center;
+  }
+  .tech-badges {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+    margin-top: 36px;
+  }
+  .tbadge {
+    font-size: 0.82rem; padding: 10px 22px;
+    border-radius: 100px;
+    background: var(--surface); border: 1px solid var(--rule);
+    color: var(--ink-secondary);
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.25s;
+  }
+  .tbadge:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .tbadge.alt:hover { border-color: var(--green); color: var(--green); background: var(--green-soft); }
+  .tbadge b { display: inline-block; width: 6px; height: 6px; border-radius: 50%; }
+  .dot-o { background: var(--accent); }
+  .dot-g { background: var(--green); }
+  .dot-g2 { background: var(--green-light); }
 
-            .link-text a:hover {
-                text-decoration: underline;
-            }
+  /* CHANGELOG */
+  .changelog { padding: 100px 0; }
+  .cl-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+  @media (max-width: 720px) { .cl-grid { grid-template-columns: 1fr; } }
+  .cl-featured {
+    grid-column: 1 / -1;
+    background: var(--surface);
+    border: 1px solid var(--rule-light);
+    border-radius: 20px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    transition: border-color 0.3s var(--ease);
+  }
+  .cl-featured:hover { border-color: var(--accent); }
+  @media (max-width: 600px) { .cl-featured { grid-template-columns: 1fr; } }
+  .cl-featured-side {
+    background: linear-gradient(160deg, var(--accent) 0%, var(--green) 100%);
+    color: #fff;
+    padding: 40px 32px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .cl-featured-ver {
+    font-family: var(--font-display);
+    font-weight: 900; font-size: 3rem;
+    line-height: 1; letter-spacing: -0.03em;
+  }
+  .cl-featured-date { font-size: 0.78rem; opacity: 0.7; margin-top: 8px; }
+  .cl-featured-body {
+    padding: 36px 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px 40px;
+    align-content: center;
+  }
+  @media (max-width: 600px) { .cl-featured-body { padding: 28px 24px; grid-template-columns: 1fr; } }
+  .cl-group h4 {
+    font-family: var(--font-display);
+    font-weight: 700; font-size: 0.72rem;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-muted); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .cl-group h4 .ico {
+    width: 18px; height: 18px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.6rem; flex-shrink: 0;
+  }
+  .ico-new { background: rgba(45,139,94,0.1); color: var(--green); }
+  .ico-imp { background: rgba(226,122,43,0.1); color: var(--accent); }
+  .ico-fix { background: rgba(180,120,50,0.12); color: #B47832; }
+  .ico-clean { background: rgba(100,100,100,0.08); color: var(--ink-muted); }
+  .cl-group ul { list-style: none; }
+  .cl-group li {
+    font-size: 0.85rem; color: var(--ink-secondary);
+    line-height: 1.65; padding: 3px 0; padding-left: 14px;
+    position: relative;
+  }
+  .cl-group li::before {
+    content: '';
+    position: absolute; left: 0; top: 12px;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--rule);
+  }
+  .cl-card {
+    background: var(--surface);
+    border: 1px solid var(--rule-light);
+    border-radius: 16px;
+    padding: 32px 28px;
+    transition: all 0.35s var(--ease);
+  }
+  .cl-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(226,122,43,0.06);
+  }
+  .cl-card-head {
+    display: flex; align-items: baseline; gap: 12px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule-light);
+  }
+  .cl-card-ver {
+    font-family: var(--font-display);
+    font-weight: 800; font-size: 1.5rem;
+    line-height: 1;
+  }
+  .cl-card-date { font-size: 0.72rem; color: var(--ink-muted); }
+  .cl-card ul { list-style: none; }
+  .cl-card li {
+    font-size: 0.85rem; color: var(--ink-secondary);
+    line-height: 1.65; padding: 3px 0; padding-left: 14px;
+    position: relative;
+  }
+  .cl-card li::before {
+    content: '';
+    position: absolute; left: 0; top: 12px;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--rule);
+  }
+  .cl-card .ttag {
+    font-size: 0.6rem; padding: 1px 7px; border-radius: 100px;
+    font-weight: 600; letter-spacing: 0.02em;
+    vertical-align: middle; margin-right: 3px;
+  }
+  .ttag-new { background: rgba(45,139,94,0.1); color: var(--green); }
+  .ttag-imp { background: rgba(226,122,43,0.1); color: var(--accent); }
+  .ttag-fix { background: rgba(180,120,50,0.12); color: #B47832; }
 
-            footer {
-                margin-top: 28px;
-                color: #64748b;
-                font-size: 0.9rem;
-            }
-        </style>
-    </head>
-    <body>
-        <main class="card">
-            <h1>澎湃First</h1>
-            <p>欢迎下载澎湃First，点击下方按钮即可前往下载页面。</p>
+  /* FAQ */
+  .faq { padding: 100px 0; }
+  .faq-list { max-width: 640px; }
+  .faq-i { border-bottom: 1px solid var(--rule-light); }
+  .faq-q {
+    width: 100%; background: none; border: none;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 22px 0; cursor: pointer;
+    font-family: var(--font-display); font-weight: 600;
+    font-size: 1.05rem; color: var(--ink); text-align: left;
+    transition: color 0.2s;
+  }
+  .faq-q:hover { color: var(--accent); }
+  .faq-arrow {
+    flex-shrink: 0; width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.3s var(--ease);
+    color: var(--ink-muted); margin-left: 16px;
+  }
+  .faq-i.open .faq-arrow { transform: rotate(45deg); color: var(--accent); }
+  .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.45s var(--ease); }
+  .faq-i.open .faq-a { max-height: 300px; }
+  .faq-a-in { padding-bottom: 22px; font-size: 0.9rem; color: var(--ink-secondary); line-height: 1.8; }
 
-            <div class="actions">
-                <a
-                    class="download-btn"
-                    href="https://1816736646.share.123pan.cn/123pan/Vot6Vv-HoIi3"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    >立即下载</a
-                >
-            </div>
-        </main>
-    </body>
+  /* CTA */
+  .cta-section {
+    padding: 120px 0; text-align: center;
+    position: relative;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 40% 50% at 30% 50%, rgba(226,122,43,0.06), transparent 70%),
+      radial-gradient(ellipse 40% 50% at 70% 50%, rgba(45,139,94,0.06), transparent 70%);
+    pointer-events: none;
+  }
+  .cta-section .inner { position: relative; z-index: 1; }
+
+  /* FOOTER */
+  .footer {
+    border-top: 1px solid var(--rule);
+    padding: 64px 0 36px;
+    text-align: center;
+  }
+  .footer-logo {
+    font-family: var(--font-display);
+    font-weight: 800; font-size: 1.4rem;
+    color: var(--ink); margin-bottom: 14px;
+  }
+  .footer-logo em { font-style: italic; color: var(--accent); }
+  .footer-p {
+    font-size: 0.85rem; color: var(--ink-muted);
+    line-height: 1.75; max-width: 480px; margin: 0 auto;
+  }
+  .footer-bottom {
+    margin-top: 40px; padding-top: 24px;
+    border-top: 1px solid var(--rule-light);
+    font-size: 0.72rem; color: var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div class="loader-mark">澎湃<em>First</em></div>
+  <div class="loader-line"><span></span></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a class="nav-logo" href="#">澎湃<em>First</em></a>
+  <div class="nav-links" id="navLinks">
+    <a href="#features">功能</a>
+    <a href="#tech">技术栈</a>
+    <a href="#changelog">更新日志</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <a class="nav-cta" href="#download">立即下载</a>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero wrap">
+  <div class="hero-lhs">
+    <div class="hero-eyebrow">面向 HyperOS / MIUI 的全能工具</div>
+    <h1>一切为你的<br><em>澎湃</em>设备</h1>
+    <p class="hero-lead">
+      集设备参数查询、固件追踪、日志解析、电池监测、社区资讯与用户协作于一体 —— 为极客与普通用户共同打造。
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-dark" href="https://1816736646.share.123pan.cn/123pan/Vot6Vv-HoIi3">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        下载 APK
+      </a>
+      <a class="btn btn-outline" href="#features">探索功能</a>
+    </div>
+  </div>
+  <div class="hero-rhs">
+    <div class="hero-card-stack">
+      <div class="hcard hcard-1">
+        <h3>澎湃First</h3>
+        <div>
+          <p>v2.1.5 · HyperOS</p>
+          <div class="hcard-1-dots"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+      <div class="hcard hcard-2">
+        <h4>能耗概览</h4>
+        <div class="hcard-bar"><span class="b1"></span></div>
+        <div class="hcard-bar"><span class="b2"></span></div>
+        <div class="hcard-bar"><span class="b3"></span></div>
+        <p style="font-size:0.72rem;color:var(--ink-muted);margin-top:6px">实时追踪电池健康状态</p>
+      </div>
+      <div class="hcard hcard-3">
+        <div class="big">19+</div>
+        <div class="sub">设备参数大类</div>
+      </div>
+      <div class="hcard-float">
+        <span class="dot"></span> 设备在线 · 运行正常
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote-section wrap narrow reveal">
+  <blockquote>"一个应用，覆盖你的澎湃设备从硬件参数到固件追踪、从极客调试到社区互动的 <span>全部需求</span>。"</blockquote>
+  <cite>—— 澎湃First 产品愿景</cite>
+</section>
+
+<!-- STATS -->
+<div class="wrap">
+  <div class="stats reveal">
+    <div><div class="stats-num o">7</div><div class="stats-label">核心模块</div></div>
+    <div><div class="stats-num g">19+</div><div class="stats-label">参数大类</div></div>
+    <div><div class="stats-num o">v2.1.5</div><div class="stats-label">最新版本</div></div>
+    <div><div class="stats-num g">API 31</div><div class="stats-label">最低系统要求</div></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="section-eyebrow reveal">核心功能</div>
+    <h2 class="section-heading reveal">七大模块<br><em>全面覆盖</em></h2>
+    <p class="section-sub reveal">从极客调试到日常使用，从固件追踪到社区互动。</p>
+    <div class="features-grid">
+      <div class="fcard wide reveal">
+        <div class="fcard-num">01</div>
+        <h3>设备参数查询</h3>
+        <p>一键导出全部硬件参数：CPU、GPU、显示、内存、存储、电池、相机、音频、网络、传感器、NFC、生物识别等 19 大类。实时监测电池电流/电压与应用耗电排行，支持能耗测试排行榜。</p>
+        <div class="fcard-tags">
+          <span class="ftag">CPU / GPU</span><span class="ftag g">显示 / 存储</span><span class="ftag">电池 / 传感器</span><span class="ftag g">能耗排行</span><span class="ftag">快照对比</span>
+        </div>
+      </div>
+      <div class="fcard alt reveal">
+        <div class="fcard-num">02</div>
+        <h3>固件版本查询</h3>
+        <p>查询 MIUI / HyperOS 内测固件，追踪穿戴设备更新，提取固件下载链接。版本演进时间线一览无余。</p>
+        <div class="fcard-tags"><span class="ftag g">内测固件</span><span class="ftag g">穿戴固件</span><span class="ftag g">固件提取</span></div>
+      </div>
+      <div class="fcard reveal">
+        <div class="fcard-num">03</div>
+        <h3>资讯与社区</h3>
+        <p>聚合澎湃资讯，追踪社区动态，参与话题讨论，发布你的观点与发现。</p>
+        <div class="fcard-tags"><span class="ftag">RSSHub</span><span class="ftag">动态流</span><span class="ftag g">话题讨论</span></div>
+      </div>
+      <div class="fcard wide alt reveal">
+        <div class="fcard-num">04</div>
+        <h3>系统工具集</h3>
+        <p>深度极客工具：日志解析、重启记录分析、终端命令执行（Shizuku 提权）、进程管理、应用管理、隐藏 Activity 页面、壁纸提取、相机参数预设、贴膜辅助。</p>
+        <div class="fcard-tags">
+          <span class="ftag g">日志解析</span><span class="ftag g">终端命令</span><span class="ftag g">进程管理</span><span class="ftag">壁纸提取</span><span class="ftag">相机预设</span><span class="ftag g">贴膜神器</span>
+        </div>
+      </div>
+      <div class="fcard reveal">
+        <div class="fcard-num">05</div>
+        <h3>云盘与下载</h3>
+        <p>内置蓝奏云盘支持，统一下载管理面板，文件管理清晰有序。</p>
+        <div class="fcard-tags"><span class="ftag">蓝奏云盘</span><span class="ftag g">下载管理</span></div>
+      </div>
+      <div class="fcard alt reveal">
+        <div class="fcard-num">06</div>
+        <h3>AI 大模型</h3>
+        <p>接入 AI 大模型能力，对话式分析日志与设备数据，让 AI 成为你的设备诊断助手。</p>
+        <div class="fcard-tags"><span class="ftag g">大模型对话</span><span class="ftag">日志分析</span></div>
+      </div>
+      <div class="fcard wide reveal">
+        <div class="fcard-num">07</div>
+        <h3>用户与协作</h3>
+        <p>完善的用户系统：个人主页、积分体系、抽奖活动、捐赠会员。支持社区协作修订与审核，关注机制与邮件通知，让社区知识共建成为可能。</p>
+        <div class="fcard-tags"><span class="ftag">积分系统</span><span class="ftag g">协作修订</span><span class="ftag">内容审核</span><span class="ftag g">邮件通知</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH -->
+<section class="tech-section" id="tech">
+  <div class="wrap reveal">
+    <div class="section-eyebrow" style="justify-content:center;">技术栈</div>
+    <h2 class="section-heading" style="font-size:clamp(1.6rem,3.5vw,2.4rem);">现代技术，极致体验</h2>
+    <div class="tech-badges">
+      <span class="tbadge"><b class="dot-o"></b>Kotlin</span>
+      <span class="tbadge alt"><b class="dot-g"></b>Jetpack Compose</span>
+      <span class="tbadge"><b class="dot-o"></b>Material 3</span>
+      <span class="tbadge alt"><b class="dot-g"></b>Shizuku</span>
+      <span class="tbadge"><b class="dot-o"></b>Android 12+ (API 31)</span>
+      <span class="tbadge alt"><b class="dot-g2"></b>无障碍服务</span>
+      <span class="tbadge"><b class="dot-o"></b>targetSdk 37</span>
+    </div>
+  </div>
+</section>
+
+<!-- CHANGELOG -->
+<section class="changelog" id="changelog">
+  <div class="wrap">
+    <div class="section-eyebrow reveal">更新日志</div>
+    <h2 class="section-heading reveal">持续 <em class="g">迭代</em></h2>
+    <p class="section-sub reveal">每个版本都在变好。以下是各版本最重要的变化。</p>
+    <div class="cl-grid">
+      <div class="cl-featured reveal">
+        <div class="cl-featured-side">
+          <div>
+            <div class="cl-featured-ver">v2.1.5</div>
+            <div class="cl-featured-date">2025 年 5 月</div>
+          </div>
+        </div>
+        <div class="cl-featured-body">
+          <div class="cl-group">
+            <h4><span class="ico ico-new">+</span> 新增功能</h4>
+            <ul>
+              <li>澎湃资讯页面上线</li>
+              <li>固件时间轴页面</li>
+              <li>个人中心全面改版，资料页独立拆分</li>
+              <li>等级颜色体系与图标+数字显示</li>
+            </ul>
+          </div>
+          <div class="cl-group">
+            <h4><span class="ico ico-imp">↑</span> 优化体验</h4>
+            <ul>
+              <li>6 个页面标签栏升级为新版样式</li>
+              <li>深色模式背景整体压深，层级更清晰</li>
+              <li>详情页导航改为图标+信息卡片布局</li>
+              <li>底部导航栏滚动隐藏逻辑优化</li>
+              <li>统一弹窗为规范组件</li>
+            </ul>
+          </div>
+          <div class="cl-group">
+            <h4><span class="ico ico-fix">!</span> 修复问题</h4>
+            <ul>
+              <li>Token 刷新后缓存未更新导致重复登录</li>
+              <li>个人中心嵌套滚动崩溃</li>
+              <li>AI 聊天长内容被截断</li>
+              <li>电池系统文件安全报错</li>
+            </ul>
+          </div>
+          <div class="cl-group">
+            <h4><span class="ico ico-clean">○</span> 工程清理</h4>
+            <ul>
+              <li>头像资源从 46 张精简至 10 张</li>
+              <li>移除全部 SVG 插图与废弃服务</li>
+              <li>清理大量无用代码与临时脚本</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="cl-card reveal">
+        <div class="cl-card-head">
+          <span class="cl-card-ver">v2.0.0</span>
+          <span class="cl-card-date">2025 年 1 月</span>
+        </div>
+        <ul>
+          <li><span class="ttag ttag-new">新</span> 2.0 版本全面上线，应用再次重构</li>
+          <li><span class="ttag ttag-new">新</span> 社区动态与内容发布系统</li>
+          <li><span class="ttag ttag-new">新</span> 用户协作修订体系</li>
+          <li><span class="ttag ttag-imp">优</span> 全面采用 Jetpack Compose UI</li>
+        </ul>
+      </div>
+      <div class="cl-card reveal">
+        <div class="cl-card-head">
+          <span class="cl-card-ver">v1.9.5</span>
+          <span class="cl-card-date">2024 年</span>
+        </div>
+        <ul>
+          <li><span class="ttag ttag-new">新</span> 蓝奏云盘功能上线</li>
+          <li><span class="ttag ttag-new">新</span> 进程管理工具</li>
+          <li><span class="ttag ttag-imp">优</span> 账号缓存逻辑优化</li>
+          <li><span class="ttag ttag-fix">修</span> 多处空指针崩溃</li>
+          <li><span class="ttag ttag-imp">优</span> 平板模式边距适配</li>
+        </ul>
+      </div>
+      <div class="cl-card reveal">
+        <div class="cl-card-head">
+          <span class="cl-card-ver">v1.9.2</span>
+          <span class="cl-card-date">2024 年</span>
+        </div>
+        <ul>
+          <li><span class="ttag ttag-new">新</span> 穿戴固件查询页面</li>
+          <li><span class="ttag ttag-new">新</span> 穿戴固件链接提取</li>
+          <li><span class="ttag ttag-imp">优</span> 内测/穿戴积分消耗逻辑</li>
+        </ul>
+      </div>
+      <div class="cl-card reveal">
+        <div class="cl-card-head">
+          <span class="cl-card-ver">v1.9.0</span>
+          <span class="cl-card-date">2024 年</span>
+        </div>
+        <ul>
+          <li><span class="ttag ttag-new">新</span> 软件全面重构</li>
+          <li><span class="ttag ttag-new">新</span> 主页卡片自定义排序</li>
+          <li><span class="ttag ttag-new">新</span> 适配 Android 17</li>
+          <li><span class="ttag ttag-imp">优</span> 主题色 / 手势 / 弹窗全面优化</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="wrap">
+    <div class="section-eyebrow reveal">常见问题</div>
+    <h2 class="section-heading reveal">你想知道的 <em>一切</em></h2>
+    <div class="faq-list">
+      <div class="faq-i">
+        <button class="faq-q">澎湃First 支持哪些设备？<span class="faq-arrow">+</span></button>
+        <div class="faq-a"><div class="faq-a-in">澎湃First 支持所有运行 Android 12（API 31）及以上版本的 Android 设备。核心功能针对搭载小米澎湃 HyperOS / MIUI 系统的设备深度适配，部分极客功能需要 Shizuku 授权。</div></div>
+      </div>
+      <div class="faq-i">
+        <button class="faq-q">需要 Root 权限吗？<span class="faq-arrow">+</span></button>
+        <div class="faq-a"><div class="faq-a-in">大部分功能无需 Root。高级系统工具依赖 Shizuku 服务，通过 ADB 激活即可，无需解锁 Bootloader 或获取 Root 权限。</div></div>
+      </div>
+      <div class="faq-i">
+        <button class="faq-q">澎湃First 是免费的吗？<span class="faq-arrow">+</span></button>
+        <div class="faq-a"><div class="faq-a-in">是的，完全免费下载和使用。我们提供捐赠会员体系作为可选支持方式，会员可获得个性化功能，所有核心功能均对所有用户开放。</div></div>
+      </div>
+      <div class="faq-i">
+        <button class="faq-q">如何参与社区协作修订？<span class="faq-arrow">+</span></button>
+        <div class="faq-a"><div class="faq-a-in">注册账号后即可参与。在应用/固件/穿戴/话题四类内容页面，你可以提交修订建议，经审核后将被合并到正式内容中。</div></div>
+      </div>
+      <div class="faq-i">
+        <button class="faq-q">隐私和数据安全如何保障？<span class="faq-arrow">+</span></button>
+        <div class="faq-a"><div class="faq-a-in">设备参数等数据默认仅在本地处理。云端功能需网络连接时会明确告知，用户可自行选择是否上传。我们不会收集与应用功能无关的个人数据。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="download">
+  <div class="wrap inner">
+    <h2 class="section-heading reveal" style="font-size:clamp(2rem,4.5vw,3.2rem);">准备好探索了吗？</h2>
+    <p class="section-sub reveal" style="margin:0 auto 40px;text-align:center;">
+      澎湃First 完全免费，持续更新。立即下载，释放你的澎湃设备全部潜能。
+    </p>
+    <div class="hero-actions reveal" style="justify-content:center;opacity:1;animation:none;">
+      <a class="btn btn-dark" href="https://1816736646.share.123pan.cn/123pan/Vot6Vv-HoIi3">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        下载 APK
+      </a>
+      <a class="btn btn-outline" href="https://github.com/mfskys/First">GitHub 仓库</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-logo">澎湃<em>First</em></div>
+    <p class="footer-p">面向小米澎湃 HyperOS / MIUI 生态的 Android 综合工具应用，致力于成为小米用户的"全能助手"。</p>
+    <div class="footer-bottom">&copy; 2026 澎湃First · All rights reserved</div>
+  </div>
+</footer>
+
+<script>
+  window.addEventListener('load', () => {
+    setTimeout(() => document.getElementById('loader').classList.add('done'), 1700);
+  });
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navLinks');
+  hamburger.addEventListener('click', () => navLinks.classList.toggle('open'));
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('stuck', window.scrollY > 40);
+  }, { passive: true });
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('vis'), i * 70);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.reveal, .fcard').forEach(el => obs.observe(el));
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.parentElement;
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-i.open').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
+</script>
+</body>
 </html>
