@@ -3,7 +3,7 @@
 > 面向小米澎湃 HyperOS / MIUI 生态的 Android 综合工具应用，致力于成为小米用户的"全能助手"。
 
 🌐 **官网**：[mfskys.github.io/First](https://mfskys.github.io/First/)  
-📦 **下载**：[最新版本](https://github.com/mfskys/First/releases)
+📦 **下载**：[最新版本](https://1816736646.share.123pan.cn/123pan/Vot6Vv-HoIi3?notoken=1)
 
 ---
 
@@ -44,18 +44,8 @@
 **Q：支持哪些设备？**  
 支持所有运行 Android 12 及以上版本的设备，核心功能针对小米澎湃 HyperOS / MIUI 设备深度适配。
 
-## 📋 更新日志
-
-### v2.1.5（2026 年 6 月）
-- 接管外部 APK 安装请求，支持 Shizuku 静默安装
-- 深色模式下弹出菜单背景色优化
-- 等级颜色体系与图标样式统一
-- 修复 59 个编译器警告
-
-完整更新日志请查看 [Releases](https://github.com/mfskys/First/releases)。
-
 ## 📎 链接
 
 - 🌐 官网：[mfskys.github.io/First](https://mfskys.github.io/First/)
-- 📦 下载：[Releases](https://github.com/mfskys/First/releases)
+- 📦 下载：[Releases](https://1816736646.share.123pan.cn/123pan/Vot6Vv-HoIi3?notoken=1)
 - 📧 反馈：通过应用内"提交反馈"或 GitHub Issues
